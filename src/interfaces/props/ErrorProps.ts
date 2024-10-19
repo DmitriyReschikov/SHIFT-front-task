@@ -1,0 +1,1 @@
+export interface ErrorProps extends React.HTMLAttributes<HTMLSpanElement> { }

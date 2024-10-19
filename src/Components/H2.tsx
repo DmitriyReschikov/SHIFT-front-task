@@ -1,18 +1,6 @@
-import styled from "styled-components";
+import { H2Props } from "../interfaces/props/H2Props"
+import { StyledH2 } from "./Styled/StyledH2"
 
-interface H2Props extends React.HTMLAttributes<HTMLButtonElement> {}
-  
-
-const StyledH2 = styled.h2`
-  font-weight: 700;
-  font-size: 24px;
-  font-line-height: 32px;
-  margin: 0
-`;
-
-
-const H2: React.FC<H2Props> = ({children}) => {
-    return <StyledH2>{children}</StyledH2>
-}
-
-export default H2
+export const H2: React.FC<H2Props> = ({children, ...rest}) => (
+  <StyledH2 {...rest}>{children}</StyledH2>
+)

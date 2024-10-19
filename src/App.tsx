@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import axios from 'axios';
-import { toast } from 'react-toastify';
+import axios from "axios";
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { postSignin, postOtp } from "./axios/requests";
+import { GlobalStyle, Grid, Col, Row, H2, Paragraph, Input, Button, Toaster, Error } from "./components";
+import { CreateOtpDto } from "./interfaces/CreateOtpDto";
+import { SigninDto } from "./interfaces/SigninDto";
 import 'react-toastify/dist/ReactToastify.css';
-import { SigninDto } from './interfaces/SigninDto';
-import { CreateOtpDto } from './interfaces/CreateOtpDto';
-import { GlobalStyle, Grid, Col, Row, H2, Paragraph, Input, Button, Toaster, Error } from './components';
-import { postOtp, postSignin } from './axios/requests';
+
 
 function App() {
   const [isContinuous, setIsContinuous] = useState<boolean>(false);
@@ -15,18 +16,24 @@ function App() {
   const [codeResendAvailable, setCodeResendAvailable] = useState<boolean>(false);
   const { register, formState: { errors }, trigger, setValue, getValues, clearErrors, setError } = useForm();
 
+  const startTimer = () => {
+    setIsContinuous(true);
+    setLeftTime(60);
+    setCodeResendAvailable(false);
+  }
+
   const Login = async () => {
     const isValid = await trigger('code') && await trigger('phone');
     if (isValid) {
       setIsLoading(true)
       try {
-        const loginData: SigninDto = {phone: getValues('phone'), code: getValues('code')}
-        const response = await postSignin({ params: loginData})
+        const loginData: SigninDto = { phone: getValues('phone'), code: getValues('code') }
+        const response = await postSignin({ params: loginData })
         toast.success(`Добро пожаловать! ${response.data.user.firstname || ''} ${response.data.user.middlename || ''} ${response.data.user.lastname || ''}`);
       }
       catch (error) {
         if (axios.isAxiosError(error)) {
-          setError('code', {message: error.response?.data.reason})
+          setError('code', { message: error.response?.data.reason })
         }
       }
       finally {
@@ -40,11 +47,9 @@ function App() {
     const isValid = await trigger('phone');
     if (isValid) {
       setIsLoading(true)
-      const createOtpData: CreateOtpDto = {phone: getValues('phone')}
+      const createOtpData: CreateOtpDto = { phone: getValues('phone') }
       await postOtp({ params: createOtpData })
-      setIsContinuous(true);
-      setLeftTime(60);
-      setCodeResendAvailable(false);
+      startTimer()
       setIsLoading(false)
     }
   };
@@ -55,7 +60,6 @@ function App() {
       return () => clearTimeout(timer);
     } else {
       setCodeResendAvailable(true);
-
     }
   }, [isContinuous, leftTime]);
 
@@ -88,7 +92,7 @@ function App() {
                   hasError={!!errors.code}
                   {...register('code', {
                     required: true,
-                    pattern: {value: /^\d{6}$/, message: "Код должен содержать ровно 6 цифр"}
+                    pattern: { value: /^\d{6}$/, message: "Код должен содержать ровно 6 цифр" }
                   })}
                   onChange={(e) => setValue('code', e.target.value)}
                 />
@@ -117,7 +121,7 @@ function App() {
           </Row>
         </Col>
       </Grid>
-      <Toaster/>
+      <Toaster />
     </>
   );
 }

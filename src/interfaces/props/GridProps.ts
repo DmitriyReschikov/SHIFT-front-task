@@ -1,0 +1,1 @@
+export interface GridProps extends React.HTMLAttributes<HTMLDivElement> {}
